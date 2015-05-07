@@ -1,6 +1,4 @@
 #!/bin/bash
 
-python count.py
-if [[ $1 == "cat" ]]; then
-    cat out
-fi
+python count.py $1
+diff --side-by-side --suppress-common-lines old out | less
