@@ -5,8 +5,19 @@ import urlparse
 import pytumblr
 import json
 import time
+from difflib import context_diff
 from unicodedata import normalize
 from pprint import pprint
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 # CHECK FOR ARGV[1]
 blogurl = ""
@@ -14,7 +25,8 @@ try:
     blogurl = sys.argv[1]
 except:
     while not blogurl:
-        blogurl = str(raw_input("Please enter your URL: "))
+        sys.stderr.write("Please enter blog URL: ")
+        blogurl = str(raw_input(""))
         if not "." in blogurl:
             blogurl = blogurl+'.tumblr.com'
 
@@ -72,8 +84,6 @@ end_time = time.time()
 elapsed_time = end_time - start_time
 print (str(elapsed_time) + " seconds to retrieve " + str(counter) + " followers")
 
-#print followers
-
 # LOAD OLD FOLLOWERS
 oldfollowers = []
 fo = open('old', 'r')
@@ -83,17 +93,55 @@ for line in fo:
 fo.close()
 #print '\n'.join(oldfollowers)
 
-joffset = 0
-
-for i in range(0,counter):
-    j = i + joffset
-    while (j < counter and oldfollowers[i] != followers[j]):
-    #    print followers[j]
-        joffset = joffset + 1
-        j = j + 1
-
+# WRITE FOLLOWERS TO FILE
 fh = open('out', 'w')
 for user in followers:
     fh.write(user+"\n")
-#fh.write("Total: "+str(counter)+" followers.\n")
 fh.close()
+
+## This will compare the two lists.
+## it prints 5 lines of context around a change (unless it is near ends of file)
+## shows a + for additions, - for deletions, ! for line changes
+## The first two lines are useless
+
+## Implementation note: urlchanges is special because we have an old url and the new url.
+## We get both of those at separate, but consecutive lines. So once we hit one, 
+## I set a toggle to wait for the next line which should contain the new URL.
+analysis = []
+newfollows = []
+unfollows = []
+urlchanges = []
+newurl = False
+for line in context_diff(oldfollowers, followers):
+    if line.startswith('+ '):
+        newfollows.append(line.strip().split(' ')[1])
+    if line.startswith('- '):
+        unfollows.append(line.strip().split(' ')[1])
+    if line.startswith('! '): 
+        if newurl:
+            templist.append(line.strip().split(' ')[1]) #add to existing list
+            urlchanges.append(templist)
+            newurl = False
+        else:
+            templist = list() #make new list
+            templist.append(line.strip().split(' ')[1])
+            newurl = True     #signal that next line is going to be new url
+    analysis.append(line)
+
+# DO THE PRINTING STUFF
+if len(newfollows):
+    sys.stdout.write(bcolors.OKGREEN + str(len(newfollows)) + " new cultists!!\n" + bcolors.ENDC)
+    #pprint(newfollows)
+else:
+    sys.stdout.write("No new people found you interesting.\n")
+    
+if len(unfollows):
+    sys.stdout.write(bcolors.FAIL + str(len(unfollows)) + " losers unfollowed. That's right. That's what you are! Nothing but a bunch of losers!!\n" + bcolors.ENDC)
+    #pprint(unfollows)
+else:
+    sys.stdout.write("No one ran away from your stank. This must be your good week.\n")
+
+sys.stdout.write(bcolors.OKBLUE + str(len(urlchanges))+" people changed their URL. Lord help us.\n" + bcolors.ENDC)
+#pprint(urlchanges)
+
+print ""
