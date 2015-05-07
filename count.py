@@ -25,7 +25,7 @@ try:
     blogurl = sys.argv[1]
 except:
     while not blogurl:
-        sys.stderr.write("Please enter blog URL: ")
+        sys.stderr.write("At least give me a blog URL: ")
         blogurl = str(raw_input(""))
         if not "." in blogurl:
             blogurl = blogurl+'.tumblr.com'
@@ -76,7 +76,7 @@ while True:
             break
     except KeyError:
         sys.stdout.flush() #to clear output buffer
-        sys.stderr.write("\nBlog not found\n")
+        sys.stderr.write("\nYou gave me an incorrect blog! I have had it up to here with you honestly.\n")
         #call function to input again once functions are in place
         exit()
 
@@ -136,7 +136,7 @@ else:
     sys.stdout.write("No new people found you interesting.\n")
     
 if len(unfollows):
-    sys.stdout.write(bcolors.FAIL + str(len(unfollows)) + " losers unfollowed. That's right. That's what you are! Nothing but a bunch of losers!!\n" + bcolors.ENDC)
+    sys.stdout.write(bcolors.FAIL + str(len(unfollows)) + " have chosen to pursue a career in the landfill business. Nothin but a bunch of LOSERS!!\n" + bcolors.ENDC)
     #pprint(unfollows)
 else:
     sys.stdout.write("No one ran away from your stank. This must be your good week.\n")
