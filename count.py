@@ -102,7 +102,7 @@ fh.close()
 ## Implementation note: urlchanges is special because we have an old url and the new url.
 ## We get both of those at separate, but consecutive lines. So once we hit one, 
 ## I set a toggle to wait for the next line which should contain the new URL.
-newfollows, unfollows, urlchanges = []
+newfollows, unfollows, urlchanges = [],[],[]
 newurl = False
 for line in context_diff(oldfollowers, followers):
     if line.startswith('+ '):
@@ -120,19 +120,27 @@ for line in context_diff(oldfollowers, followers):
             newurl = True     #signal that next line is going to be new url
 
 # DO THE PRINTING STUFF
-if len(newfollows):
-    sys.stdout.write(bcolors.OKGREEN + str(len(newfollows)) + " new cultists!!\n" + bcolors.ENDC)
+if newfollows:
+    sys.stdout.write(bcolors.OKGREEN + str(len(newfollows))
+                     + " new cultists!!\n"
+                     + bcolors.ENDC)
     pprint(newfollows)
 else:
     sys.stdout.write("No new people found you interesting.\n")
     
-if len(unfollows):
-    sys.stdout.write(bcolors.FAIL + str(len(unfollows)) + " have chosen to pursue a career in the landfill business. Nothin but a bunch of LOSERS!!\n" + bcolors.ENDC)
+if unfollows:
+    sys.stdout.write(bcolors.FAIL + str(len(unfollows)) 
+                     + " have chosen to pursue a career in the landfill business." 
+                     + " Nothin but a bunch of LOSERS!!\n"
+                     + bcolors.ENDC)
     pprint(unfollows)
 else:
     sys.stdout.write("No one ran away from your stank. This must be your good week.\n")
 
-sys.stdout.write(bcolors.OKBLUE + str(len(urlchanges))+" people changed their URL. Lord help us.\n" + bcolors.ENDC)
-pprint(urlchanges)
+if urlchanges:
+    sys.stdout.write(bcolors.OKBLUE + str(len(urlchanges)) 
+                     + " people changed their URL. Lord help us.\n" 
+                     + bcolors.ENDC)
+    pprint(urlchanges)
 
 print ""
