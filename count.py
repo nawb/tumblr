@@ -1,5 +1,5 @@
 #!/usr/bin python
-import sys, oauth2, urlparse, pytumblr, json, time
+import os, sys, oauth2, urlparse, pytumblr, json, time
 from difflib import context_diff
 from unicodedata import normalize
 from pprint import pprint
@@ -13,6 +13,9 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+# GLOBAL VARIABLES
+storageDir = '.saves/'
 
 # CHECK FOR ARGV[1]
 blogurl = ""
@@ -79,20 +82,26 @@ end_time = time.time()
 elapsed_time = end_time - start_time
 print (str(elapsed_time) + " seconds to retrieve " + str(counter) + " followers")
 
+# WRITE FOLLOWERS TO FILE
+fh = open(storageDir+'out', 'w')
+for user in followers:
+    fh.write(user+"\n")
+fh.close()
+
+# If this is the first time this script is being run, there will be no old followers
+if not os.path.exists(storageDir+'old'):
+    sys.stdout.write("Thanks for using. :) "
+                     + "We will have something for you the next time you run it.\n")
+    exit()
+
 # LOAD OLD FOLLOWERS
 oldfollowers = []
-fo = open('old', 'r')
+fo = open(storageDir+'old', 'r')
 for line in fo:
     line = line.strip()
     oldfollowers.append(line)
 fo.close()
 #print '\n'.join(oldfollowers)
-
-# WRITE FOLLOWERS TO FILE
-fh = open('out', 'w')
-for user in followers:
-    fh.write(user+"\n")
-fh.close()
 
 ## This will compare the two lists.
 ## it prints 5 lines of context around a change (unless it is near ends of file)
