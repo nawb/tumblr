@@ -133,7 +133,8 @@ if newfollows:
     sys.stdout.write(bcolors.OKGREEN + str(len(newfollows))
                      + " new cultists!!\n"
                      + bcolors.ENDC)
-    pprint(newfollows)
+    temp = [sys.stdout.write(" %s," % (newfollower)) for newfollower in newfollows]
+    sys.stdout.write("\b  \n") #sketchy way to erase the last comma
 else:
     sys.stdout.write("No new people found you interesting.\n")
     
@@ -142,7 +143,8 @@ if unfollows:
                      + " have chosen to pursue a career in the landfill business." 
                      + " Nothin but a bunch of LOSERS!!\n"
                      + bcolors.ENDC)
-    pprint(unfollows)
+    temp = [sys.stdout.write(" %s," % (unfollower)) for unfollower in unfollows]
+    sys.stdout.write("\b  \n") #erase the last comma
 else:
     sys.stdout.write("No one ran away from your stank. This must be your good week.\n")
 
@@ -150,6 +152,7 @@ if urlchanges:
     sys.stdout.write(bcolors.OKBLUE + str(len(urlchanges)) 
                      + " people changed their URL. Lord help us.\n" 
                      + bcolors.ENDC)
-    pprint(urlchanges)
+    temp = [sys.stdout.write("%13s -> %s\n" % (oldurl,newurl)) for oldurl,newurl in urlchanges]
+    #13 is the average length of a url (based on scientific study done on my followers list)
 
 print ""
