@@ -17,16 +17,19 @@ class bcolors:
 # GLOBAL VARIABLES
 storageDir = '.saves/'
 
-# CHECK FOR ARGV[1]
-blogurl = ""
-try:
-    blogurl = sys.argv[1]
-except:
-    while not blogurl:
-        sys.stderr.write("At least give me a blog URL: ")
-        blogurl = str(raw_input(""))
-        if not "." in blogurl:
-            blogurl = blogurl+'.tumblr.com'
+def getBlogUrl(blogurl=""):
+    # CHECK FOR ARGV[1]
+    try:
+        blogurl = sys.argv[1]
+    except:
+        while not blogurl:
+            sys.stderr.write("At least give me a blog URL: ")
+            blogurl = str(raw_input(""))
+    if not "." in blogurl:
+        blogurl = blogurl+'.tumblr.com'
+    return blogurl
+
+blogurl = getBlogUrl()
 
 REQUEST_TOKEN_URL = 'http://www.tumblr.com/oauth/request_token'
 AUTHORIZATION_URL = 'http://www.tumblr.com/oauth/authorize'
@@ -42,18 +45,21 @@ client = pytumblr.TumblrRestClient(
   'BCADjechYrTsfZFK154mOohXkMP2kOpE0WW8gDIxlueU3viLzC'
 )
 
-sys.stdout.write("Retrieving followers")
 
 setFollowers = set()
 followers = []
 counter = 0
 offset = 0
 doneCounting = False
+firstLine = True
 start_time = time.time()
 
 while True:
     try:
         response = client.followers(blogurl, offset=offset)['users']
+        if firstLine:
+            firstLine = False
+            sys.stdout.write("Retrieving followers")
         offset = offset + 20
         sys.stdout.flush() #to clear output buffer
         sys.stdout.write(".")
@@ -75,7 +81,10 @@ while True:
     except KeyError:
         sys.stdout.flush() #to clear output buffer
         sys.stderr.write("\nYou gave me an incorrect blog! I have had it up to here with you honestly.\n")
-        #call function to input again once functions are in place
+        blogurl = getBlogUrl()
+    except:
+        sys.stdout.flush() #to clear output buffer
+        sys.stderr.write("\nError retrieving. Try again in a minute.\n")
         exit()
 
 end_time = time.time()
