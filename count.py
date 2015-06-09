@@ -120,9 +120,12 @@ fo.close()
 ## Implementation note: urlchanges is special because we have an old url and the new url.
 ## We get both of those at separate, but consecutive lines. So once we hit one, 
 ## I set a toggle to wait for the next line which should contain the new URL.
+
+## n in context_diff() sets number of lines of context to show. it fixes a case where two
+## users appearing consecutively might fall in chargedurls, and get mixed up
 newfollows, unfollows, urlchanges = [],[],[]
 newurl = False
-for line in context_diff(oldfollowers, followers):
+for line in context_diff(oldfollowers, followers, n=0):
     if line.startswith('+ '):
         newfollows.append(line.strip().split(' ')[1])
     if line.startswith('- '):
