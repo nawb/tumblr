@@ -6,8 +6,9 @@ if [[ ! -d "$STORAGE" ]]; then
     mkdir $STORAGE
 fi
 
-python count.py $1
+python count.py $1 > blamesgohere
 #diff --side-by-side --suppress-common-lines old out | less
+cat blamesgohere
 
 #inc counter if file already exists for same date
 newfilename=$(date +%Y%m%d)
