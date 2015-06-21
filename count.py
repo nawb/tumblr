@@ -158,7 +158,7 @@ def analyzeFollowers(followers, oldfollowers):
         #13 is the average length of a url (based on scientific study done on my followers list)
 
 ########
-  MAIN 
+#  MAIN 
 ########
 
 blogurl = getBlogUrl()
@@ -179,6 +179,7 @@ if not followercnt:
     exit()
 elapsed_time = end_time - start_time
 print (str(elapsed_time) + " seconds to retrieve " + str(followercnt) + " followers")
+WriteToFile(followers,storageDir)
 oldfollowers = loadOldFollowers(storageDir)
 analyzeFollowers(followers, oldfollowers)
 print ""
