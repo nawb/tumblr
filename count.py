@@ -101,7 +101,15 @@ def loadOldFollowers(storageDir):
     #print '\n'.join(oldfollowers)
     return oldfollowers
 
-def analyzeFollowers(followers, oldfollowers):
+def TumblrExists(url, client):
+    statuscode = client.blog_info(url+'tumblr.com')['meta']
+    if statuscode['status'] == 200:
+        return True
+    else:
+        #print statuscode['msg']
+        return False
+
+def analyzeFollowers(followers, oldfollowers, client):
     ## This will compare the two lists.
     ## it prints 5 lines of context around a change (unless it is near ends of file)
     ## shows a + for additions, - for deletions, ! for line changes
@@ -113,13 +121,16 @@ def analyzeFollowers(followers, oldfollowers):
     
     ## n in context_diff() sets number of lines of context to show. it fixes a case where two
     ## users appearing consecutively might fall in chargedurls, and get mixed up
-    newfollows, unfollows, urlchanges = [],[],[]
+    newfollows, unfollows, deactives, urlchanges = [],[],[],[]
     newurl = False
     for line in context_diff(oldfollowers, followers, n=0):
         if line.startswith('+ '):
             newfollows.append(line.strip().split(' ')[1])
         if line.startswith('- '):
-            unfollows.append(line.strip().split(' ')[1])
+            if TumblrExists(line.strip().split(' ')[1], client):
+                unfollows.append(line.strip().split(' ')[1])
+            else:
+                deactives.append(line.strip().split(' ')[1])
         if line.startswith('! '): 
             if newurl:
                 templist.append(line.strip().split(' ')[1]) #add to existing list
@@ -150,6 +161,14 @@ def analyzeFollowers(followers, oldfollowers):
     else:
         sys.stdout.write("No one ran away from your stank. This must be your good week.\n")
     
+    if deactives:
+        sys.stdout.write(bcolors.FAIL + str(len(deactives)) 
+                         + " people deactivated. A prayer for those freed.\n" 
+                         + bcolors.ENDC)
+
+        temp = [sys.stdout.write(" %s," % (deactive)) for deactive in deactives]
+        sys.stdout.write("\b  \n") #erase the last comma
+
     if urlchanges:
         sys.stdout.write(bcolors.OKBLUE + str(len(urlchanges)) 
                          + " people changed their URL. Lord help us.\n" 
@@ -181,5 +200,5 @@ elapsed_time = end_time - start_time
 print (str(elapsed_time) + " seconds to retrieve " + str(followercnt) + " followers")
 WriteToFile(followers,storageDir)
 oldfollowers = loadOldFollowers(storageDir)
-analyzeFollowers(followers, oldfollowers)
+analyzeFollowers(followers, oldfollowers, client)
 print ""
