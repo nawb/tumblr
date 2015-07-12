@@ -102,13 +102,19 @@ def loadOldFollowers(storageDir):
     return oldfollowers
 
 def TumblrExists(url, client):
-    statuscode = client.blog_info(url+'tumblr.com')['meta']
-    if statuscode['status'] == 200:
-        return True
-    else:
-        #print statuscode['msg']
-        return False
-
+    statuscode = client.blog_info(url)
+    try:
+        if statuscode['meta']['status'] == 200:
+            return True
+        else:
+            #print statuscode['msg']
+            return False
+    except KeyError:
+        if len(statuscode['blog']) > 0:
+            return True
+    except:
+        print "Error checking blog!!"
+        
 def analyzeFollowers(followers, oldfollowers, client):
     ## This will compare the two lists.
     ## it prints 5 lines of context around a change (unless it is near ends of file)
