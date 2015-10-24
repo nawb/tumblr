@@ -51,8 +51,12 @@ def getFollowers(client, blogurl):
             offset = offset + 20
             sys.stdout.flush() #to clear output buffer
             sys.stdout.write(".")
-    
-            for i in range(0,20):
+            # sys.stdout.write("Got %d new followers\n" % len(response))
+
+            if len(response) == 0:
+                doneCounting = True
+
+            for i in range(0,len(response)):
                 try:
                     #extract name field and convert from unicode
                     user = response[i]['name'].encode('ascii', 'ignore')
@@ -70,9 +74,10 @@ def getFollowers(client, blogurl):
             sys.stdout.flush() #to clear output buffer
             sys.stderr.write("\nYou gave me an incorrect blog! I have had it up to here with you honestly.\n")
             blogurl = getBlogUrl()
-        except:
+        except Exception as e:
             sys.stdout.flush() #to clear output buffer
             sys.stderr.write("\nError retrieving. Try again in a minute.\n")
+           # sys.stderr.write(e)
             exit()
     
     return followers, counter
